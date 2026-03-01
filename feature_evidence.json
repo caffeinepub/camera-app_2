@@ -1,0 +1,58 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-redesign-the-camera-viewfinder-control-layout-to-adopt-a-cinema-camera-aesthetic-replace-the-current-controls-with-a-professional-cinematography-inspired-ui-featuring-an-anamorphic-widescreen-letterbox-overlay-toggle-2-39-1-crop-guides-a-cinema-style-circular-exposure-wheel-dial-for-ev-adjustment-cine-color-profile-selector-rec-709-log-c-flat-d-cinema-and-a-focal-length-lens-indicator-overlay-label-group-these-controls-in-a-dedicated-cinema-controls-panel-that-slides-up-when-cinematic-or-video-mode-is-active-keep-all-existing-functional-hooks-usemanualcontrols-usecinematicmode-etc-wired-to-the-new-ui-elements",
+      "featureTitle": "Redesign the camera viewfinder control layout to adopt a cinema camera aesthetic: replace the current controls with a professional cinematography-inspired UI featuring an anamorphic widescreen letterbox overlay toggle (2.39:1 crop guides), a cinema-style circular exposure wheel/dial for EV adjustment, cine color profile selector (Rec.709, Log-C flat, D-Cinema), and a focal length/lens indicator overlay label. Group these controls in a dedicated 'Cinema Controls' panel that slides up when Cinematic or Video mode is active. Keep all existing functional hooks (useManualControls, useCinematicMode, etc.) wired to the new UI elements.",
+      "files": [
+        "frontend/src/components/AnamorphicOverlay.tsx",
+        "frontend/src/components/CinemaControlsPanel.tsx",
+        "frontend/src/components/FocalLengthIndicator.tsx",
+        "frontend/src/hooks/useAnamorphicOverlay.ts",
+        "frontend/src/hooks/useCineColorProfile.ts",
+        "frontend/src/hooks/useManualControls.ts",
+        "frontend/src/pages/CameraPage.tsx"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-22"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-increase-the-background-blur-intensity-across-all-blur-producing-effects-in-useaiblur-raise-the-canvas-blur-filter-sigma-so-the-background-blur-is-visibly-stronger-minimum-effective-blur-radius-equivalent-to-css-blur-24px-or-higher-in-usecinematicmode-increase-the-background-blur-sigma-applied-to-the-off-screen-canvas-to-a-minimum-of-blur-28px-equivalent-in-focuseditpanel-raise-the-default-and-maximum-blur-intensity-slider-values-so-the-bokeh-mask-produces-a-more-pronounced-separation-expose-a-blur-strength-quick-toggle-button-in-the-camera-controls-row-light-strong-max-that-scales-the-blur-multiplier-at-runtime-across-all-active-blur-effects",
+      "featureTitle": "Increase the background blur intensity across all blur-producing effects: in useAIBlur, raise the canvas blur filter sigma so the background blur is visibly stronger (minimum effective blur radius equivalent to CSS blur(24px) or higher); in useCinematicMode, increase the background blur sigma applied to the off-screen canvas to a minimum of blur(28px) equivalent; in FocusEditPanel, raise the default and maximum blur intensity slider values so the bokeh mask produces a more pronounced separation. Expose a 'Blur Strength' quick-toggle button in the camera controls row (Light / Strong / Max) that scales the blur multiplier at runtime across all active blur effects.",
+      "files": [
+        "frontend/src/components/BlurStrengthToggle.tsx",
+        "frontend/src/components/FocusEditPanel.tsx",
+        "frontend/src/hooks/useAIBlur.ts",
+        "frontend/src/hooks/useBlurStrength.ts",
+        "frontend/src/hooks/useCinematicMode.ts",
+        "frontend/src/pages/CameraPage.tsx"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-23"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

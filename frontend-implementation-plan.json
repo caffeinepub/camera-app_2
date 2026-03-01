@@ -1,0 +1,100 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Cinema Camera Controls & Enhanced Blur Intensity",
+  "requirements": [
+    {
+      "id": "REQ-22",
+      "summary": "Redesign camera controls with cinema camera aesthetic featuring anamorphic letterbox toggle, circular exposure wheel, cine color profile selector, and focal length indicator overlay for Cinematic and Video modes",
+      "acceptanceCriteria": [
+        "A circular exposure wheel/dial is visible and functional in Cinematic and Video modes, replacing or augmenting the existing EV slider",
+        "A cine color profile selector with at least Rec.709, Log-C (flat), and D-Cinema options is visible and applies a CSS/canvas filter to the live preview",
+        "An anamorphic crop guide toggle (2.39:1 letterbox bars) is accessible and renders as a semi-transparent overlay on the viewfinder",
+        "A focal length/lens indicator label (e.g. '24mm eq.') is shown as a HUD overlay on the viewfinder",
+        "All new controls use the existing dark amber/gold theme and glass-morphism styling consistent with the app's design tokens",
+        "Existing functionality (zoom, torch, grid, timer, manual controls) remains fully operational"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/CinemaControlsPanel.tsx",
+          "operation": "create",
+          "description": "Create a new Cinema Controls panel component that slides up when Cinematic or Video mode is active. Include: (1) circular exposure wheel/dial UI element for EV adjustment that calls existing manual controls hooks, (2) cine color profile selector dropdown/buttons for Rec.709, Log-C (flat), and D-Cinema profiles, (3) anamorphic letterbox (2.39:1) toggle button, (4) focal length indicator label display. Style with amber/gold accents and glass-morphism matching existing design tokens from frontend/tailwind.config.js."
+        },
+        {
+          "path": "frontend/src/hooks/useCineColorProfile.ts",
+          "operation": "create",
+          "description": "Create a hook to manage selected cine color profile state (Rec.709, Log-C, D-Cinema) with localStorage persistence. Export profile name and setter. This hook will be consumed by CinemaControlsPanel and applied as CSS filters or canvas effects to the video stream."
+        },
+        {
+          "path": "frontend/src/hooks/useAnamorphicOverlay.ts",
+          "operation": "create",
+          "description": "Create a hook to manage anamorphic letterbox overlay toggle state (on/off) with localStorage persistence under a 'cameraAnamorphicOverlay' key. Export boolean state and toggle function."
+        },
+        {
+          "path": "frontend/src/components/AnamorphicOverlay.tsx",
+          "operation": "create",
+          "description": "Create an overlay component that renders semi-transparent black letterbox bars for 2.39:1 aspect ratio crop guides. Position absolutely over the viewfinder with pointer-events-none. Show/hide based on useAnamorphicOverlay state."
+        },
+        {
+          "path": "frontend/src/components/FocalLengthIndicator.tsx",
+          "operation": "create",
+          "description": "Create a HUD overlay component that displays the current focal length equivalent (e.g. '24mm eq.') in the top-left or top-right corner of the viewfinder. Style with glass-morphism and amber text. Position absolutely over the video element."
+        },
+        {
+          "path": "frontend/src/pages/CameraPage.tsx",
+          "operation": "modify",
+          "description": "Wire the new CinemaControlsPanel component into the camera page layout: render it conditionally when mode is 'Cinematic' or 'Video'. Also render AnamorphicOverlay and FocalLengthIndicator as absolute overlays on the video container when their respective states are active. Apply the selected cine color profile as a CSS filter on the video element or pass it to useCinematicMode for canvas-based rendering."
+        },
+        {
+          "path": "frontend/src/hooks/useManualControls.ts",
+          "operation": "modify",
+          "description": "Extend the hook to expose the current EV value so that CinemaControlsPanel can display and update it via the circular exposure wheel. Ensure the exposure setter is callable from the new cinema controls UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-23",
+      "summary": "Increase background blur intensity across all blur effects (AI Blur, Cinematic Mode, Focus Edit) and add a 'Blur Strength' quick-toggle button with Light/Strong/Max presets",
+      "acceptanceCriteria": [
+        "AI Blur background is visibly much stronger — background details are heavily obscured at default strength",
+        "Cinematic Mode background blur is stronger by default, producing clear subject/background separation",
+        "FocusEditPanel maximum blur intensity is increased so exported frames show pronounced bokeh",
+        "A 'Blur Strength' toggle button with three levels (Light, Strong, Max) appears in the camera controls row when AI Blur or Cinematic mode is active",
+        "Selecting 'Max' produces near-complete background obscuration while keeping the subject mask sharp",
+        "The blur strength preference persists in localStorage across sessions"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useAIBlur.ts",
+          "operation": "modify",
+          "description": "Increase the default canvas blur filter sigma to a minimum equivalent of CSS blur(24px) or higher. Expose a blurMultiplier parameter (default 1.0) that scales the base sigma, allowing runtime adjustment via the Blur Strength toggle. Apply the multiplier to the background blur rendering in the canvas composite."
+        },
+        {
+          "path": "frontend/src/hooks/useCinematicMode.ts",
+          "operation": "modify",
+          "description": "Increase the background blur sigma applied to the off-screen canvas to a minimum equivalent of CSS blur(28px). Add support for a blurMultiplier parameter (default 1.0) that scales the blur intensity. Wire this multiplier to allow runtime control from the Blur Strength toggle."
+        },
+        {
+          "path": "frontend/src/components/FocusEditPanel.tsx",
+          "operation": "modify",
+          "description": "Raise the default and maximum blur intensity slider values so the bokeh mask produces more pronounced separation. Increase the blur radius calculation to apply stronger blur to the off-focus areas of the video preview and exported frames."
+        },
+        {
+          "path": "frontend/src/hooks/useBlurStrength.ts",
+          "operation": "create",
+          "description": "Create a hook to manage blur strength state with three levels: 'Light' (1.0x), 'Strong' (1.5x), 'Max' (2.5x). Persist the selected level in localStorage under 'cameraBlurStrength'. Export the current multiplier value and a setter function."
+        },
+        {
+          "path": "frontend/src/components/BlurStrengthToggle.tsx",
+          "operation": "create",
+          "description": "Create a segmented control button component with three options: Light, Strong, Max. Use amber accent styling for the active selection and glass-morphism. Display inline in the camera controls row."
+        },
+        {
+          "path": "frontend/src/pages/CameraPage.tsx",
+          "operation": "modify",
+          "description": "Render the BlurStrengthToggle component in the camera controls row when AI Blur or Cinematic mode is active. Pass the current blur multiplier from useBlurStrength to useAIBlur and useCinematicMode hooks so the blur intensity dynamically adjusts based on the selected strength level."
+        }
+      ]
+    }
+  ]
+}

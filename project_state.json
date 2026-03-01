@@ -1,0 +1,281 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 11,
+  "summary": "A professional camera app inspired by Sony Xperia Pro-I/Pro, featuring advanced photo and video capabilities including manual controls, video recording, and pro-level camera features.",
+  "architectural_notes": [
+    "Video recording uses MediaRecorder API with configurable MIME type/bitrate; recorded blobs saved as base64 or object URLs via backend.",
+    "Cinematic/AI blur features require TensorFlow.js or similar ML library for real-time segmentation/depth estimation in the browser; post-shoot focus editing requires per-frame mask data stored alongside video."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-build-a-live-camera-viewfinder-page-that-accesses-the-user-s-device-camera-via-the-browser-mediadevices-api-displays-the-live-video-stream-full-screen-with-an-overlay-capture-button-and-on-capture-takes-a-snapshot-of-the-current-frame-to-a-canvas-converts-it-to-a-data-url-and-saves-it-via-the-backend",
+      "title": "Build a live camera viewfinder page that accesses the user's device camera via the browser MediaDevices API, displays the live video stream full-screen with an overlay capture button, and on capture takes a snapshot of the current frame to a canvas, converts it to a data URL, and saves it via the backend.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-photo-gallery-page-that-fetches-all-saved-photos-from-the-backend-and-displays-them-in-a-responsive-masonry-style-grid-each-photo-card-shows-the-image-thumbnail-and-capture-timestamp-tapping-a-thumbnail-opens-a-full-screen-lightbox-with-zoom-support-photos-can-be-deleted-from-both-the-lightbox-and-the-grid",
+      "title": "Build a photo gallery page that fetches all saved photos from the backend and displays them in a responsive masonry-style grid. Each photo card shows the image thumbnail and capture timestamp. Tapping a thumbnail opens a full-screen lightbox with zoom support. Photos can be deleted from both the lightbox and the grid.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-bottom-navigation-bar-with-two-tabs-camera-viewfinder-and-gallery-so-the-user-can-switch-between-views-the-active-tab-should-be-visually-highlighted",
+      "title": "Add a bottom navigation bar with two tabs — Camera (viewfinder) and Gallery — so the user can switch between views. The active tab should be visually highlighted.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-cohesive-dark-mode-visual-theme-inspired-by-professional-camera-apps-deep-charcoal-and-near-black-backgrounds-warm-amber-gold-accent-colors-for-interactive-elements-clean-sans-serif-typography-and-subtle-film-grain-texture-touches-enforce-this-theme-consistently-across-all-pages-and-components",
+      "title": "Apply a cohesive dark-mode visual theme inspired by professional camera apps: deep charcoal and near-black backgrounds, warm amber/gold accent colors for interactive elements, clean sans-serif typography, and subtle film-grain texture touches. Enforce this theme consistently across all pages and components.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-render-a-custom-app-icon-logo-image-for-the-camera-app-header-a-stylized-camera-lens-graphic-stored-as-a-static-asset-at-frontend-public-assets-generated",
+      "title": "Generate and render a custom app icon/logo image for the camera app header — a stylized camera lens graphic — stored as a static asset at frontend/public/assets/generated/.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-front-rear-camera-toggle-button-to-the-camera-viewfinder-page-the-button-should-switch-between-the-device-s-front-facing-and-rear-facing-cameras-without-interrupting-the-live-preview-persist-the-last-used-camera-preference-in-localstorage",
+      "title": "Add a front/rear camera toggle button to the camera viewfinder page. The button should switch between the device's front-facing and rear-facing cameras without interrupting the live preview. Persist the last-used camera preference in localStorage.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-digital-zoom-control-to-the-camera-viewfinder-page-display-a-horizontal-slider-or-pinch-to-zoom-gesture-that-adjusts-zoom-level-from-1-up-to-the-device-s-maximum-supported-zoom-show-the-current-zoom-level-e-g-2-0-as-an-overlay-label-that-fades-out-after-interaction",
+      "title": "Add a digital zoom control to the camera viewfinder page. Display a horizontal slider (or pinch-to-zoom gesture) that adjusts zoom level from 1× up to the device's maximum supported zoom. Show the current zoom level (e.g. '2.0×') as an overlay label that fades out after interaction.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-grid-overlay-toggle-to-the-camera-viewfinder-the-button-cycles-through-no-grid-rule-of-thirds-3-3-grid-square-crop-guide-off-draw-the-grid-as-a-semi-transparent-svg-or-canvas-overlay-on-top-of-the-live-video",
+      "title": "Add a grid overlay toggle to the camera viewfinder. The button cycles through: no grid → rule-of-thirds (3×3) grid → square crop guide → off. Draw the grid as a semi-transparent SVG or canvas overlay on top of the live video.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-self-timer-control-to-the-camera-viewfinder-a-timer-icon-button-cycles-through-0-s-off-3-s-and-10-s-when-a-timer-is-active-and-the-shutter-is-pressed-display-a-large-countdown-on-screen-with-each-second-shown-as-a-distinct-tick-then-capture-the-photo-when-the-countdown-reaches-zero",
+      "title": "Add a self-timer control to the camera viewfinder. A timer icon button cycles through 0 s (off), 3 s, and 10 s. When a timer is active and the shutter is pressed, display a large countdown on screen with each second shown as a distinct tick, then capture the photo when the countdown reaches zero.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-manual-exposure-brightness-and-white-balance-controls-to-the-camera-viewfinder-expose-two-vertical-sliders-on-the-side-of-the-viewfinder-one-for-exposure-compensation-ev-2-to-2-and-one-for-white-balance-color-temperature-2700-k-6500-k-apply-these-via-the-mediastreamtrack-advanced-constraints-api-exposurecompensation-and-colortemperature-where-supported-with-graceful-fallback-to-css-brightness-filter-for-unsupported-devices",
+      "title": "Add manual exposure (brightness) and white balance controls to the camera viewfinder. Expose two vertical sliders on the side of the viewfinder — one for exposure compensation (EV, -2 to +2) and one for white balance (color temperature 2700 K–6500 K). Apply these via the MediaStreamTrack advanced constraints API (exposureCompensation and colorTemperature) where supported, with graceful fallback to CSS brightness filter for unsupported devices.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-torch-flashlight-toggle-button-to-the-camera-viewfinder-for-rear-camera-mode-the-button-should-have-three-states-off-on-torch-and-auto-apply-the-torch-mode-via-mediastreamtrack-advanced-constraints-torch-true-false-hide-or-disable-the-button-when-using-the-front-camera-or-when-torch-is-not-supported-by-the-device",
+      "title": "Add a torch/flashlight toggle button to the camera viewfinder for rear-camera mode. The button should have three states: Off, On (torch), and Auto. Apply the torch mode via MediaStreamTrack advanced constraints (torch: true/false). Hide or disable the button when using the front camera or when torch is not supported by the device.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-video-recording-mode-to-the-camera-viewfinder-page-use-the-mediarecorder-api-to-record-the-live-camera-stream-provide-a-dedicated-record-button-distinct-from-the-photo-shutter-that-starts-and-stops-recording-display-a-live-recording-timer-elapsed-hh-mm-ss-with-a-pulsing-red-indicator-while-recording-is-active-on-stop-collect-the-recorded-blob-convert-it-to-a-data-url-or-object-url-and-save-the-clip-metadata-id-timestamp-duration-dataurl-to-the-backend",
+      "title": "Add a video recording mode to the camera viewfinder page. Use the MediaRecorder API to record the live camera stream. Provide a dedicated record button (distinct from the photo shutter) that starts and stops recording. Display a live recording timer (elapsed HH:MM:SS) with a pulsing red indicator while recording is active. On stop, collect the recorded Blob, convert it to a data URL or object URL, and save the clip metadata (id, timestamp, duration, dataUrl) to the backend.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-sony-xperia-pro-style-horizontal-mode-selector-bar-above-the-shutter-record-controls-modes-photo-video-portrait-night-pro-tapping-a-mode-label-slides-a-highlight-indicator-to-that-mode-with-a-smooth-animation-switching-to-video-mode-shows-the-record-button-and-hides-the-photo-shutter-switching-to-photo-portrait-or-night-mode-shows-the-photo-shutter-and-hides-the-record-button-pro-mode-shows-the-photo-shutter-and-exposes-full-manual-controls",
+      "title": "Add a Sony Xperia Pro-style horizontal mode selector bar above the shutter/record controls. Modes: Photo, Video, Portrait, Night, Pro. Tapping a mode label slides a highlight indicator to that mode with a smooth animation. Switching to Video mode shows the record button and hides the photo shutter. Switching to Photo, Portrait, or Night mode shows the photo shutter and hides the record button. Pro mode shows the photo shutter and exposes full manual controls.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-pro-manual-mode-screen-within-the-camera-viewfinder-when-pro-mode-is-active-display-an-additional-control-row-with-sliders-or-steppers-for-iso-50-6400-in-standard-steps-shutter-speed-1-4000s-to-30s-in-fractional-stops-focus-mode-toggle-af-mf-with-a-manual-focus-distance-slider-when-mf-is-selected-and-white-balance-presets-auto-daylight-cloudy-tungsten-fluorescent-apply-iso-and-shutter-speed-constraints-via-mediastreamtrack-advanced-constraints-where-supported-with-a-css-filter-based-fallback-for-iso-brightness-simulation-on-unsupported-devices",
+      "title": "Implement a Pro/Manual mode screen within the camera viewfinder. When Pro mode is active, display an additional control row with sliders or steppers for: ISO (50–6400 in standard steps), Shutter Speed (1/4000s to 30s in fractional stops), Focus Mode toggle (AF / MF with a manual focus distance slider when MF is selected), and White Balance presets (Auto, Daylight, Cloudy, Tungsten, Fluorescent). Apply ISO and shutter speed constraints via MediaStreamTrack advanced constraints where supported, with a CSS filter-based fallback for ISO brightness simulation on unsupported devices.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-video-resolution-and-frame-rate-selector-to-the-video-mode-ui-display-a-compact-pill-chip-selector-with-options-1080p-30fps-1080p-60fps-4k-30fps-show-4k-only-if-device-supports-it-via-getusermedia-constraints-apply-the-selected-resolution-and-frame-rate-as-mediastreamtrack-constraints-when-starting-or-restarting-the-stream-in-video-mode-persist-the-last-used-resolution-setting-in-localstorage",
+      "title": "Add a video resolution and frame rate selector to the Video mode UI. Display a compact pill/chip selector with options: 1080p@30fps, 1080p@60fps, 4K@30fps (show 4K only if device supports it via getUserMedia constraints). Apply the selected resolution and frame rate as MediaStreamTrack constraints when starting or restarting the stream in Video mode. Persist the last-used resolution setting in localStorage.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-gallery-page-to-display-recorded-video-clips-alongside-photos-show-video-clips-in-the-same-responsive-grid-distinguish-them-with-a-play-button-overlay-icon-and-their-duration-label-tapping-a-video-clip-opens-the-existing-fullscreen-lightbox-adapted-to-render-an-html5-video-element-with-playback-controls-instead-of-an-img-tag-support-deletion-of-video-clips-from-both-the-grid-and-the-lightbox-using-the-deletevideo-backend-endpoint",
+      "title": "Extend the Gallery page to display recorded video clips alongside photos. Show video clips in the same responsive grid; distinguish them with a play-button overlay icon and their duration label. Tapping a video clip opens the existing fullscreen lightbox adapted to render an HTML5 <video> element with playback controls instead of an <img> tag. Support deletion of video clips from both the grid and the lightbox using the deleteVideo backend endpoint.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-apple-style-cinematic-mode-to-the-camera-viewfinder-when-cinematic-mode-is-active-add-it-as-a-new-entry-in-the-modeselector-bar-between-portrait-and-night-use-the-mediastream-api-to-capture-live-video-and-apply-a-real-time-css-canvas-based-depth-of-field-simulation-blur-the-background-behind-the-detected-primary-subject-using-a-radial-elliptical-bokeh-mask-centered-on-the-subject-s-face-or-body-region-detected-via-the-browser-s-barcodedetector-or-a-simple-center-weighted-heuristic-if-facedetector-is-unavailable-display-a-soft-blue-ai-processing-indicator-badge-ai-cinematic-while-the-effect-is-active-record-the-composite-output-blurred-stream-via-mediarecorder-the-same-way-video-mode-does-save-the-resulting-clip-to-the-backend-using-the-existing-savevideo-mutation",
+      "title": "Add an Apple-style Cinematic Mode to the camera viewfinder. When Cinematic mode is active (add it as a new entry in the ModeSelector bar between Portrait and Night), use the MediaStream API to capture live video and apply a real-time CSS/canvas-based depth-of-field simulation: blur the background behind the detected primary subject using a radial/elliptical bokeh mask centered on the subject's face or body region (detected via the browser's BarcodeDetector or a simple center-weighted heuristic if FaceDetector is unavailable). Display a soft blue AI processing indicator badge ('AI CINEMATIC') while the effect is active. Record the composite output (blurred stream) via MediaRecorder the same way Video mode does. Save the resulting clip to the backend using the existing saveVideo mutation.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-real-time-ai-style-background-blur-portrait-video-bokeh-during-video-recording-available-in-both-video-mode-and-cinematic-mode-toggled-by-a-dedicated-ai-blur-button-in-the-camera-controls-row-when-enabled-use-an-off-screen-canvas-to-composite-the-live-camera-feed-apply-a-strong-gaussian-style-blur-to-the-full-frame-and-then-paint-the-estimated-foreground-subject-region-center-weighted-oval-mask-or-face-bounding-box-when-available-at-full-sharpness-on-top-producing-a-digital-blue-bokeh-background-effect-the-resulting-composited-canvas-stream-replaces-the-raw-camera-stream-in-the-mediarecorder-so-the-saved-clip-contains-the-blurred-background-display-a-pulsing-blue-ai-indicator-icon-when-ai-blur-is-active",
+      "title": "Implement real-time AI-style background blur (portrait video bokeh) during video recording. Available in both Video mode and Cinematic mode, toggled by a dedicated 'AI Blur' button in the camera controls row. When enabled, use an off-screen canvas to composite the live camera feed: apply a strong Gaussian-style blur to the full frame and then paint the estimated foreground subject region (center-weighted oval mask or face-bounding-box when available) at full sharpness on top, producing a digital blue bokeh background effect. The resulting composited canvas stream replaces the raw camera stream in the MediaRecorder so the saved clip contains the blurred background. Display a pulsing blue 'AI' indicator icon when AI Blur is active.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-post-shoot-focus-editing-for-saved-video-clips-in-the-gallery-page-when-a-user-opens-a-video-clip-in-the-videolightbox-add-a-focus-edit-button-tapping-it-enters-focus-edit-mode-overlay-the-video-with-a-draggable-focus-point-indicator-a-circular-reticle-a-focus-radius-slider-to-adjust-the-sharp-region-size-and-a-blur-intensity-slider-the-app-then-renders-the-video-frame-by-frame-onto-a-canvas-using-requestvideoframecallback-or-a-periodic-requestanimationframe-loop-applying-a-radial-bokeh-mask-sharp-inside-the-reticle-blurred-outside-matching-the-user-s-settings-provide-a-preview-toggle-to-see-the-effect-applied-live-during-playback-provide-an-export-frame-button-that-captures-the-currently-displayed-processed-canvas-frame-as-a-png-and-saves-it-as-a-new-photo-via-the-savephoto-backend-mutation-persist-the-user-s-last-used-focus-point-position-and-blur-intensity-in-localstorage-keyed-by-video-clip-id",
+      "title": "Add post-shoot focus editing for saved video clips. In the Gallery page, when a user opens a video clip in the VideoLightbox, add a 'Focus Edit' button. Tapping it enters Focus Edit mode: overlay the video with a draggable focus point indicator (a circular reticle), a 'Focus Radius' slider to adjust the sharp region size, and a 'Blur Intensity' slider. The app then renders the video frame-by-frame onto a canvas (using requestVideoFrameCallback or a periodic requestAnimationFrame loop), applying a radial bokeh mask (sharp inside the reticle, blurred outside) matching the user's settings. Provide a 'Preview' toggle to see the effect applied live during playback. Provide an 'Export Frame' button that captures the currently displayed (processed) canvas frame as a PNG and saves it as a new photo via the savePhoto backend mutation. Persist the user's last-used focus point position and blur intensity in localStorage keyed by video clip id.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-camera-viewfinder-control-layout-to-adopt-a-cinema-camera-aesthetic-replace-the-current-controls-with-a-professional-cinematography-inspired-ui-featuring-an-anamorphic-widescreen-letterbox-overlay-toggle-2-39-1-crop-guides-a-cinema-style-circular-exposure-wheel-dial-for-ev-adjustment-cine-color-profile-selector-rec-709-log-c-flat-d-cinema-and-a-focal-length-lens-indicator-overlay-label-group-these-controls-in-a-dedicated-cinema-controls-panel-that-slides-up-when-cinematic-or-video-mode-is-active-keep-all-existing-functional-hooks-usemanualcontrols-usecinematicmode-etc-wired-to-the-new-ui-elements",
+      "title": "Redesign the camera viewfinder control layout to adopt a cinema camera aesthetic: replace the current controls with a professional cinematography-inspired UI featuring an anamorphic widescreen letterbox overlay toggle (2.39:1 crop guides), a cinema-style circular exposure wheel/dial for EV adjustment, cine color profile selector (Rec.709, Log-C flat, D-Cinema), and a focal length/lens indicator overlay label. Group these controls in a dedicated 'Cinema Controls' panel that slides up when Cinematic or Video mode is active. Keep all existing functional hooks (useManualControls, useCinematicMode, etc.) wired to the new UI elements.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-increase-the-background-blur-intensity-across-all-blur-producing-effects-in-useaiblur-raise-the-canvas-blur-filter-sigma-so-the-background-blur-is-visibly-stronger-minimum-effective-blur-radius-equivalent-to-css-blur-24px-or-higher-in-usecinematicmode-increase-the-background-blur-sigma-applied-to-the-off-screen-canvas-to-a-minimum-of-blur-28px-equivalent-in-focuseditpanel-raise-the-default-and-maximum-blur-intensity-slider-values-so-the-bokeh-mask-produces-a-more-pronounced-separation-expose-a-blur-strength-quick-toggle-button-in-the-camera-controls-row-light-strong-max-that-scales-the-blur-multiplier-at-runtime-across-all-active-blur-effects",
+      "title": "Increase the background blur intensity across all blur-producing effects: in useAIBlur, raise the canvas blur filter sigma so the background blur is visibly stronger (minimum effective blur radius equivalent to CSS blur(24px) or higher); in useCinematicMode, increase the background blur sigma applied to the off-screen canvas to a minimum of blur(28px) equivalent; in FocusEditPanel, raise the default and maximum blur intensity slider values so the bokeh mask produces a more pronounced separation. Expose a 'Blur Strength' quick-toggle button in the camera controls row (Light / Strong / Max) that scales the blur multiplier at runtime across all active blur effects.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Camera viewfinder with capture button",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Photo gallery to view captured images",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement a backend actor that stores captured photo metadata (id, timestamp, dataUrl) in stable memory, exposes functions to save a new photo and retrieve all saved photos, and supports deletion of individual photos by id.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Pro camera features (e.g. manual exposure/ISO/shutter, white balance, zoom, grid overlay, timer, flash/torch control, front/rear camera switch)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Video recording mode with start/stop controls, recording timer display, and ability to save recorded video clips",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Sony Xperia Pro-style mode selector (Photo, Video, Portrait, Night, Pro/Manual) with smooth switching between modes",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Pro/Manual mode with full manual controls: ISO, shutter speed, aperture (where supported), focus mode (AF/MF), and white balance presets",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Video gallery support: display recorded video clips alongside photos, with playback in a fullscreen lightbox",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Video resolution and frame rate selector (e.g. 1080p@30fps, 1080p@60fps, 4K@30fps) for video recording mode",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Extend the backend actor to support saving and retrieving video clip metadata alongside photos. Add a saveVideo function accepting (id: Text, timestamp: Int, durationSeconds: Nat, dataUrl: Text), a getAllVideos query returning all video records, and a deleteVideo function by id. Store video records in a stable map separate from photos.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Apple-like Cinematic Mode: AI-driven depth-of-field video with shallow focus blur, subject tracking, and automatic focus transitions between subjects during recording",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "AI Video Digital Blur: apply real-time AI background blur/bokeh effect during video recording (portrait-style video blur)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Post-shoot focus editing for video: after recording, allow user to adjust/change the focus point on a clip (rack focus editing), simulating cinematic refocus on saved videos",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Cinema camera-style controls: professional cinematography UI with cinema-style control layout (e.g. lens/focal controls, cinema-style exposure wheel, anamorphic mode, cine color profiles)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Increase blur intensity for background blur/bokeh effects (both AI blur and cinematic mode) to produce stronger, more pronounced background separation",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Camera App",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

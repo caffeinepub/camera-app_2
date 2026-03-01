@@ -6,7 +6,7 @@
   "frontend/src/components/AppHeader.tsx": "App header displaying the camera lens icon asset and \"Lens Studio\" branding with subtitle, styled with glass morphism on the dark theme.",
   "frontend/src/components/AppFooter.tsx": "Footer with copyright year, heart icon in amber, and caffeine.ai attribution link with UTM tracking parameters using the current hostname.",
   "frontend/src/components/BottomNavigation.tsx": "Fixed bottom navigation bar with Camera and Gallery tabs, amber active indicator line with glow, icon scaling, and bold label for the active tab.",
-  "frontend/src/pages/CameraPage.tsx": "Full camera page using correct existing hook interfaces (useCamera from `../camera/useCamera`, useZoomControl with number arg, ZoomSlider with `onChange` prop, VideoResolutionSelector with `activeResolution` prop, ProModeControls with `videoTrack` prop, ManualControlsPanel with all required props), integrating cinema controls, anamorphic overlay, focal length indicator, and blur strength toggle.",
+  "frontend/src/pages/CameraPage.tsx": "Full camera page using all existing hooks with their correct API signatures (useCountdownTimer with isActive/remainingSeconds/start/cancel, useAIBlur/useCinematicMode with options object, ManualControlsPanel with exposureSupported/whiteBalanceSupported, CinemaControlsPanel with all required props), plus the new useNoiseReduction hook for AI denoising in Night/Portrait modes with a Sparkles quick-toggle button and HUD badge.",
   "frontend/src/pages/GalleryPage.tsx": "Gallery page merging photos and videos in chronological order, using PhotoLightbox with its existing `onDelete: () => void` interface and VideoLightbox for video playback with delete support.",
   "frontend/src/components/PhotoLightbox.tsx": "Full-screen photo lightbox with prev/next navigation (keyboard + buttons), thumbnail strip, delete button with loading state, and smooth fade-in animation.",
   "frontend/index.html": "HTML entry point with viewport-fit=cover meta tag, dark theme-color, and updated title \"Lens Studio\".",
@@ -36,5 +36,7 @@
   "frontend/src/components/AnamorphicOverlay.tsx": "New overlay component rendering semi-transparent 2.39:1 letterbox bars with aspect ratio label, positioned absolutely with pointer-events disabled.",
   "frontend/src/components/FocalLengthIndicator.tsx": "New HUD overlay showing focal length equivalent (e.g. '24mm eq.') derived from zoom level, styled with glass-morphism and amber text.",
   "frontend/src/components/BlurStrengthToggle.tsx": "New segmented control with Light/Strong/Max blur levels using amber accent for active selection and glass-morphism styling.",
-  "frontend/src/components/CinemaControlsPanel.tsx": "New cinema controls panel with draggable circular exposure wheel/dial, cine color profile selector (Rec.709/Log-C/D-Cinema), and anamorphic 2.39:1 toggle."
+  "frontend/src/components/CinemaControlsPanel.tsx": "New cinema controls panel with draggable circular exposure wheel/dial, cine color profile selector (Rec.709/Log-C/D-Cinema), and anamorphic 2.39:1 toggle.",
+  "frontend/src/hooks/useNoiseReduction.ts": "New hook implementing canvas-based AI noise reduction using a bilateral-filter simulation with configurable strength levels (off/light/strong/max), auto-enabling for low-light modes, and localStorage persistence.",
+  "frontend/src/components/NoiseReductionToggle.tsx": "Segmented control UI component for selecting AI denoise strength (Off/Light/Strong/Max) with amber active styling, an animated ON badge, and a Sparkles icon header."
 }

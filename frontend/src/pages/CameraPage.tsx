@@ -1,66 +1,69 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useCamera } from '../camera/useCamera';
-import { useManualControls } from '@/hooks/useManualControls';
-import { useCameraMode } from '@/hooks/useCameraMode';
-import { useZoomControl } from '@/hooks/useZoomControl';
-import { useCountdownTimer } from '@/hooks/useCountdownTimer';
-import { useTorchControl } from '@/hooks/useTorchControl';
-import { useCinematicMode } from '@/hooks/useCinematicMode';
-import { useAIBlur } from '@/hooks/useAIBlur';
-import { useBlurStrength } from '@/hooks/useBlurStrength';
-import { useCineColorProfile } from '@/hooks/useCineColorProfile';
-import { useAnamorphicOverlay } from '@/hooks/useAnamorphicOverlay';
-import { useSavePhoto, useSaveVideo } from '@/hooks/useQueries';
-import { useVideoResolution } from '@/hooks/useVideoResolution';
-import { useCameraSettings } from '@/hooks/useCameraSettings';
-import type { GridMode } from '@/hooks/useCameraSettings';
-import GridOverlay from '@/components/GridOverlay';
-import CountdownOverlay from '@/components/CountdownOverlay';
-import ZoomSlider from '@/components/ZoomSlider';
-import ManualControlsPanel from '@/components/ManualControlsPanel';
-import ModeSelector from '@/components/ModeSelector';
-import VideoResolutionSelector from '@/components/VideoResolutionSelector';
-import ProModeControls from '@/components/ProModeControls';
-import AnamorphicOverlay from '@/components/AnamorphicOverlay';
-import FocalLengthIndicator from '@/components/FocalLengthIndicator';
-import BlurStrengthToggle from '@/components/BlurStrengthToggle';
-import CinemaControlsPanel from '@/components/CinemaControlsPanel';
+import { useCameraMode } from '../hooks/useCameraMode';
+import { useCameraSettings } from '../hooks/useCameraSettings';
+import { useZoomControl } from '../hooks/useZoomControl';
+import { useCountdownTimer } from '../hooks/useCountdownTimer';
+import { useManualControls } from '../hooks/useManualControls';
+import { useTorchControl } from '../hooks/useTorchControl';
+import { useVideoResolution } from '../hooks/useVideoResolution';
+import { useBlurStrength } from '../hooks/useBlurStrength';
+import { useAIBlur } from '../hooks/useAIBlur';
+import { useCinematicMode } from '../hooks/useCinematicMode';
+import { useAnamorphicOverlay } from '../hooks/useAnamorphicOverlay';
+import { useCineColorProfile } from '../hooks/useCineColorProfile';
+import { useNoiseReduction } from '../hooks/useNoiseReduction';
+import { useSavePhoto, useSaveVideo } from '../hooks/useQueries';
 import { toast } from 'sonner';
 import {
   Camera,
   Video,
-  SwitchCamera,
-  Grid3X3,
+  FlipHorizontal,
+  Grid,
   Timer,
   Zap,
   ZapOff,
-  Layers,
-  Settings,
-  Circle,
-  Square,
-  Loader2,
+  Settings2,
+  Sparkles,
 } from 'lucide-react';
-
-type TimerDuration = 0 | 3 | 10;
-const TIMER_CYCLE: TimerDuration[] = [0, 3, 10];
-const GRID_CYCLE: GridMode[] = ['off', 'rule-of-thirds', 'square'];
-
-function formatRecordingTime(seconds: number): string {
-  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-  const s = (seconds % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
-}
+import ModeSelector from '../components/ModeSelector';
+import GridOverlay from '../components/GridOverlay';
+import CountdownOverlay from '../components/CountdownOverlay';
+import ZoomSlider from '../components/ZoomSlider';
+import ManualControlsPanel from '../components/ManualControlsPanel';
+import VideoResolutionSelector from '../components/VideoResolutionSelector';
+import ProModeControls from '../components/ProModeControls';
+import AnamorphicOverlay from '../components/AnamorphicOverlay';
+import FocalLengthIndicator from '../components/FocalLengthIndicator';
+import BlurStrengthToggle from '../components/BlurStrengthToggle';
+import CinemaControlsPanel from '../components/CinemaControlsPanel';
+import NoiseReductionToggle from '../components/NoiseReductionToggle';
 
 export default function CameraPage() {
-  const { settings, saveFacingMode, saveGridMode, saveTimerDuration, saveTorchMode, saveExposure, saveWhiteBalance } =
-    useCameraSettings();
+  const { mode, setMode } = useCameraMode();
+  const {
+    settings,
+    saveFacingMode,
+    saveGridMode,
+    saveTimerDuration,
+    saveTorchMode,
+    saveExposure,
+    saveWhiteBalance,
+  } = useCameraSettings();
+
+  const { level: blurLevel, multiplier: blurMultiplier, setLevel: setBlurLevel } = useBlurStrength();
+  const { isActive: isAnamorphic } = useAnamorphicOverlay();
+  const { cssFilter, profile: colorProfile, setProfile: setColorProfile } = useCineColorProfile();
+  const { resolution, setResolution } = useVideoResolution();
+
+  const isLowLightMode = mode === 'Night' || mode === 'Portrait';
+  const noiseReduction = useNoiseReduction(isLowLightMode);
 
   const {
     isActive,
     isSupported,
-    error,
-    isLoading,
-    currentFacingMode,
+    error: cameraError,
+    isLoading: cameraLoading,
     startCamera,
     stopCamera,
     capturePhoto,
@@ -68,39 +71,28 @@ export default function CameraPage() {
     retry,
     videoRef,
     canvasRef,
+    currentFacingMode,
   } = useCamera({
     facingMode: settings.facingMode,
-    quality: 0.92,
+    quality: 0.95,
     format: 'image/jpeg',
   });
 
-  const { mode, setMode } = useCameraMode();
-  const { exposure, whiteBalance, setExposure, setWhiteBalance } = useManualControls();
-  const { zoom, maxZoom, setZoom, applyZoom, onPinchStart, onPinchMove, onPinchEnd } = useZoomControl(1);
+  const getVideoTrack = useCallback((): MediaStreamTrack | null => {
+    if (videoRef.current?.srcObject instanceof MediaStream) {
+      return videoRef.current.srcObject.getVideoTracks()[0] ?? null;
+    }
+    return null;
+  }, [videoRef]);
+
+  const { zoom, setZoom, maxZoom, applyZoom, onPinchStart, onPinchMove, onPinchEnd } = useZoomControl(1);
+
+  // useCountdownTimer returns: { isActive, remainingSeconds, start, cancel }
   const countdown = useCountdownTimer();
+
+  const { exposure, whiteBalance, setExposure, setWhiteBalance } = useManualControls();
+
   const torchControl = useTorchControl(settings.torchMode);
-  const { resolution, setResolution } = useVideoResolution();
-  const { level: blurLevel, multiplier: blurMultiplier, setLevel: setBlurLevel } = useBlurStrength();
-  const { profile: colorProfile, cssFilter: colorFilter, setProfile: setColorProfile } = useCineColorProfile();
-  const { isActive: anamorphicActive } = useAnamorphicOverlay();
-
-  const savePhotoMutation = useSavePhoto();
-  const saveVideoMutation = useSaveVideo();
-
-  const [gridMode, setGridMode] = useState<GridMode>(settings.gridMode);
-  const [timerDuration, setTimerDuration] = useState<TimerDuration>(settings.timerDuration as TimerDuration);
-  const [showManualControls, setShowManualControls] = useState(false);
-  const [showCinemaControls, setShowCinemaControls] = useState(false);
-  const [isCapturing, setIsCapturing] = useState(false);
-  const [isFlashing, setIsFlashing] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingSeconds, setRecordingSeconds] = useState(0);
-
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
-  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const recordingStartTimeRef = useRef<number>(0);
-  const activeTrackRef = useRef<MediaStreamTrack | null>(null);
 
   const isCinematic = mode === 'Cinematic';
   const isVideoMode = mode === 'Video';
@@ -108,24 +100,6 @@ export default function CameraPage() {
   const isProMode = mode === 'Pro';
   const isVideoOrCinematic = isVideoMode || isCinematic;
   const showBlurStrength = isPortraitMode || isCinematic;
-  const showCinemaPanel = isVideoOrCinematic;
-
-  // Derive raw stream from video element
-  const [rawStream, setRawStream] = useState<MediaStream | null>(null);
-  useEffect(() => {
-    if (isActive && videoRef.current?.srcObject instanceof MediaStream) {
-      setRawStream(videoRef.current.srcObject as MediaStream);
-    } else {
-      setRawStream(null);
-    }
-  }, [isActive, videoRef]);
-
-  // Cinematic mode compositing
-  useCinematicMode({
-    enabled: isCinematic && isActive,
-    videoRef,
-    blurMultiplier,
-  });
 
   // AI Blur compositing (Portrait mode)
   useAIBlur({
@@ -134,6 +108,27 @@ export default function CameraPage() {
     blurMultiplier,
   });
 
+  // Cinematic mode compositing
+  useCinematicMode({
+    enabled: isCinematic && isActive,
+    videoRef,
+    blurMultiplier,
+  });
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [showManualControls, setShowManualControls] = useState(false);
+  const [showCinemaControls, setShowCinemaControls] = useState(false);
+  const [isFlashing, setIsFlashing] = useState(false);
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const recordingStartTimeRef = useRef<number>(0);
+
+  const savePhotoMutation = useSavePhoto();
+  const saveVideoMutation = useSaveVideo();
+
   // Initialize track capabilities when camera becomes active
   useEffect(() => {
     if (!isActive || !videoRef.current) return;
@@ -141,7 +136,6 @@ export default function CameraPage() {
     if (!stream) return;
     const tracks = stream.getVideoTracks();
     const track = tracks[0] ?? null;
-    activeTrackRef.current = track;
     applyZoom(track);
     torchControl.initTorch(track);
     setExposure(settings.exposure, track, videoRef.current);
@@ -176,23 +170,55 @@ export default function CameraPage() {
     };
   }, [isRecording]);
 
-  const getVideoTrack = useCallback((): MediaStreamTrack | null => {
-    const stream = videoRef.current?.srcObject as MediaStream | null;
-    return stream?.getVideoTracks()[0] ?? null;
-  }, [videoRef]);
+  const formatRecordingTime = (seconds: number): string => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   const doCapture = useCallback(async () => {
-    setIsCapturing(true);
     setIsFlashing(true);
     setTimeout(() => setIsFlashing(false), 450);
     try {
       const file = await capturePhoto();
       if (!file) {
         toast.error('Failed to capture photo');
-        setIsCapturing(false);
         return;
       }
-      const arrayBuffer = await file.arrayBuffer();
+
+      // Apply noise reduction if enabled (Night / Portrait modes)
+      let finalFile = file;
+      if (noiseReduction.isEnabled && canvasRef.current) {
+        try {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+            await new Promise<void>((resolve) => {
+              img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                noiseReduction.processCanvas(canvas);
+                resolve();
+              };
+              img.src = objectUrl;
+            });
+            URL.revokeObjectURL(objectUrl);
+            const blob = await new Promise<Blob | null>((resolve) =>
+              canvas.toBlob(resolve, 'image/jpeg', 0.95)
+            );
+            if (blob) {
+              finalFile = new File([blob], file.name, { type: 'image/jpeg' });
+            }
+          }
+        } catch {
+          // fallback to original file
+        }
+      }
+
+      const arrayBuffer = await finalFile.arrayBuffer();
       const imageData = new Uint8Array(arrayBuffer) as Uint8Array<ArrayBuffer>;
       const id = `photo_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
       const timestamp = BigInt(Date.now());
@@ -200,23 +226,21 @@ export default function CameraPage() {
       toast.success('Photo saved!', { description: 'View it in your gallery', duration: 2000 });
     } catch {
       toast.error('Failed to save photo');
-    } finally {
-      setIsCapturing(false);
     }
-  }, [capturePhoto, savePhotoMutation]);
+  }, [capturePhoto, noiseReduction, canvasRef, savePhotoMutation]);
 
   const handleCapture = useCallback(() => {
-    if (!isActive || isCapturing) return;
+    if (!isActive) return;
     if (countdown.isActive) {
       countdown.cancel();
       return;
     }
-    if (timerDuration > 0) {
-      countdown.start(timerDuration, doCapture);
+    if (settings.timerDuration > 0) {
+      countdown.start(settings.timerDuration, doCapture);
     } else {
       doCapture();
     }
-  }, [isActive, isCapturing, countdown, timerDuration, doCapture]);
+  }, [isActive, countdown, settings.timerDuration, doCapture]);
 
   const startRecording = useCallback(() => {
     const stream = videoRef.current?.srcObject as MediaStream | null;
@@ -292,18 +316,18 @@ export default function CameraPage() {
   }, [currentFacingMode, switchCamera, saveFacingMode, torchControl]);
 
   const handleGridCycle = useCallback(() => {
-    const idx = GRID_CYCLE.indexOf(gridMode);
-    const next = GRID_CYCLE[(idx + 1) % GRID_CYCLE.length];
-    setGridMode(next);
+    const modes = ['off', 'rule-of-thirds', 'square'] as const;
+    const idx = modes.indexOf(settings.gridMode as typeof modes[number]);
+    const next = modes[(idx + 1) % modes.length];
     saveGridMode(next);
-  }, [gridMode, saveGridMode]);
+  }, [settings.gridMode, saveGridMode]);
 
   const handleTimerCycle = useCallback(() => {
-    const idx = TIMER_CYCLE.indexOf(timerDuration);
-    const next = TIMER_CYCLE[(idx + 1) % TIMER_CYCLE.length];
-    setTimerDuration(next);
+    const timers = [0, 3, 10] as const;
+    const idx = timers.indexOf(settings.timerDuration as typeof timers[number]);
+    const next = timers[(idx + 1) % timers.length];
     saveTimerDuration(next);
-  }, [timerDuration, saveTimerDuration]);
+  }, [settings.timerDuration, saveTimerDuration]);
 
   const handleTorchCycle = useCallback(() => {
     const track = getVideoTrack();
@@ -331,7 +355,7 @@ export default function CameraPage() {
   // Compute video CSS filter combining exposure and color profile
   const videoFilter = [
     exposure !== 0 ? `brightness(${1 + exposure * 0.25})` : '',
-    isVideoOrCinematic ? colorFilter : '',
+    isVideoOrCinematic ? cssFilter : '',
   ]
     .filter(Boolean)
     .join(' ') || undefined;
@@ -340,9 +364,6 @@ export default function CameraPage() {
   if (isSupported === false) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 px-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-surface-2 flex items-center justify-center">
-          <Grid3X3 size={32} className="text-muted-foreground" />
-        </div>
         <h2 className="font-display text-xl font-semibold">Camera Not Supported</h2>
         <p className="text-muted-foreground text-sm max-w-xs">
           Your browser doesn't support camera access. Try Chrome or Safari on a modern device.
@@ -352,18 +373,15 @@ export default function CameraPage() {
   }
 
   // Error state
-  if (error && !isLoading) {
+  if (cameraError && !cameraLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-5 px-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
-          <span className="text-destructive text-2xl">!</span>
-        </div>
         <div>
           <h2 className="font-display text-xl font-semibold mb-2">Camera Error</h2>
           <p className="text-muted-foreground text-sm max-w-xs">
-            {error.type === 'permission'
+            {cameraError.type === 'permission'
               ? 'Camera permission was denied. Please allow camera access in your browser settings and try again.'
-              : error.message}
+              : cameraError.message}
           </p>
         </div>
         <button
@@ -377,12 +395,9 @@ export default function CameraPage() {
   }
 
   // Idle / not started
-  if (!isActive && !isLoading) {
+  if (!isActive && !cameraLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-5 px-6 text-center animate-fade-in">
-        <div className="w-20 h-20 rounded-full bg-surface-2 flex items-center justify-center">
-          <Grid3X3 size={36} className="text-amber" />
-        </div>
+      <div className="flex flex-col items-center justify-center h-full gap-5 px-6 text-center">
         <div>
           <h2 className="font-display text-xl font-semibold mb-2">Ready to Shoot</h2>
           <p className="text-muted-foreground text-sm max-w-xs">
@@ -423,21 +438,38 @@ export default function CameraPage() {
         />
 
         {/* Grid overlay */}
-        <GridOverlay mode={gridMode} />
+        <GridOverlay mode={settings.gridMode} />
 
         {/* Hidden canvas for capture */}
         <canvas ref={canvasRef} className="hidden" />
 
         {/* Anamorphic overlay */}
-        <AnamorphicOverlay isActive={anamorphicActive && isVideoOrCinematic} />
+        <AnamorphicOverlay isActive={isAnamorphic && isVideoOrCinematic} />
 
         {/* Focal length indicator */}
         {isVideoOrCinematic && <FocalLengthIndicator zoom={zoom} />}
 
+        {/* AI Denoise active badge */}
+        {noiseReduction.isEnabled && isActive && (
+          <div
+            className="absolute top-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full"
+            style={{
+              background: 'rgba(20,15,5,0.80)',
+              border: '1px solid rgba(245,158,11,0.5)',
+              boxShadow: '0 0 16px rgba(245,158,11,0.4)',
+            }}
+          >
+            <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
+            <span className="text-amber-300 text-xs font-bold tracking-widest uppercase">
+              AI Denoise · {noiseReduction.strength}
+            </span>
+          </div>
+        )}
+
         {/* Cinematic badge */}
         {isCinematic && isActive && (
           <div
-            className="absolute top-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full"
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full"
             style={{
               background: 'rgba(10,20,50,0.80)',
               border: '1px solid rgba(96,165,250,0.5)',
@@ -452,7 +484,7 @@ export default function CameraPage() {
         {/* AI Blur badge */}
         {isPortraitMode && isActive && (
           <div
-            className="absolute top-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full"
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full"
             style={{
               background: 'rgba(10,20,50,0.80)',
               border: '1px solid rgba(96,165,250,0.5)',
@@ -461,16 +493,6 @@ export default function CameraPage() {
           >
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
             <span className="text-blue-300 text-xs font-bold tracking-widest uppercase">AI Blur</span>
-          </div>
-        )}
-
-        {/* Loading overlay */}
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 size={32} className="text-amber animate-spin" />
-              <p className="text-sm text-muted-foreground">Starting camera…</p>
-            </div>
           </div>
         )}
 
@@ -489,206 +511,203 @@ export default function CameraPage() {
 
         {/* Recording indicator */}
         {isRecording && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm z-10">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-white font-mono text-sm font-bold">
-              {formatRecordingTime(recordingSeconds)}
-            </span>
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm z-20">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-white text-xs font-mono">{formatRecordingTime(recordingSeconds)}</span>
+          </div>
+        )}
+
+        {/* Manual Controls Panel */}
+        {showManualControls && (isProMode || isPortraitMode) && (
+          <ManualControlsPanel
+            exposure={exposure}
+            whiteBalance={whiteBalance}
+            exposureSupported={true}
+            whiteBalanceSupported={true}
+            onExposureChange={handleExposureChange}
+            onWhiteBalanceChange={handleWhiteBalanceChange}
+          />
+        )}
+
+        {/* Cinema Controls Panel */}
+        {showCinemaControls && isCinematic && (
+          <CinemaControlsPanel
+            exposure={exposure}
+            onExposureChange={handleExposureChange}
+            colorProfile={colorProfile}
+            onColorProfileChange={setColorProfile}
+          />
+        )}
+
+        {/* Pro Mode Controls */}
+        {isProMode && (
+          <div className="absolute bottom-0 left-0 right-0 z-10 bg-black/60 backdrop-blur-sm">
+            <ProModeControls videoTrack={getVideoTrack()} />
+          </div>
+        )}
+
+        {/* Zoom Slider */}
+        {isActive && maxZoom > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-64 z-10">
+            <ZoomSlider zoom={zoom} maxZoom={maxZoom} onChange={setZoom} />
           </div>
         )}
       </div>
 
-      {/* Mode selector */}
-      <ModeSelector mode={mode} onModeChange={setMode} />
+      {/* Mode Selector */}
+      <div className="bg-black/80 backdrop-blur-sm pt-2">
+        <ModeSelector mode={mode} onModeChange={setMode} />
+      </div>
 
-      {/* Cinema Controls Panel */}
-      {showCinemaPanel && showCinemaControls && (
-        <CinemaControlsPanel
-          exposure={exposure}
-          onExposureChange={handleExposureChange}
-          colorProfile={colorProfile}
-          onColorProfileChange={setColorProfile}
-          zoom={zoom}
-        />
-      )}
-
-      {/* Manual Controls Panel (floating, absolute) */}
-      {showManualControls && isProMode && (
-        <ManualControlsPanel
-          exposure={exposure}
-          whiteBalance={whiteBalance}
-          exposureSupported={false}
-          whiteBalanceSupported={false}
-          onExposureChange={handleExposureChange}
-          onWhiteBalanceChange={handleWhiteBalanceChange}
-        />
-      )}
-
-      {/* Pro mode controls */}
-      {isProMode && (
-        <ProModeControls videoTrack={activeTrackRef.current} />
-      )}
-
-      {/* Video resolution selector */}
-      {isVideoOrCinematic && (
-        <div className="flex justify-center py-1">
+      {/* Controls Bar */}
+      <div className="bg-black/90 backdrop-blur-sm px-4 py-3 flex flex-col gap-3">
+        {/* Video resolution selector */}
+        {isVideoOrCinematic && (
           <VideoResolutionSelector
             activeResolution={resolution}
             onResolutionChange={setResolution}
           />
-        </div>
-      )}
+        )}
 
-      {/* Bottom controls */}
-      <div className="flex flex-col gap-2 px-4 pb-4 pt-2 bg-black/80">
-        {/* Top row: utility controls */}
-        <div className="flex items-center justify-between gap-2">
+        {/* Noise Reduction Toggle - shown in Night, Portrait, and when manually enabled */}
+        {(isLowLightMode || noiseReduction.isEnabled) && (
+          <NoiseReductionToggle
+            strength={noiseReduction.strength}
+            onStrengthChange={noiseReduction.setStrength}
+          />
+        )}
+
+        {/* Blur Strength Toggle - shown in Portrait/Cinematic */}
+        {showBlurStrength && (
+          <BlurStrengthToggle level={blurLevel} onSelect={setBlurLevel} />
+        )}
+
+        {/* Main Controls Row */}
+        <div className="flex items-center justify-between">
           {/* Left controls */}
           <div className="flex items-center gap-2">
-            {/* Grid toggle */}
             <button
               onClick={handleGridCycle}
-              className={`p-2 rounded-full transition-all ${
-                gridMode !== 'off'
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                  : 'bg-white/5 text-white/50 border border-white/10'
+              className={`p-2 rounded-full transition-colors ${
+                settings.gridMode !== 'off'
+                  ? 'bg-amber-500/20 text-amber-400'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
-              <Grid3X3 className="w-4 h-4" />
+              <Grid className="w-5 h-5" />
             </button>
 
-            {/* Timer toggle */}
             <button
               onClick={handleTimerCycle}
-              className={`p-2 rounded-full transition-all min-w-[36px] flex items-center justify-center ${
-                timerDuration > 0
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                  : 'bg-white/5 text-white/50 border border-white/10'
+              className={`relative p-2 rounded-full transition-colors ${
+                settings.timerDuration > 0
+                  ? 'bg-amber-500/20 text-amber-400'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
-              {timerDuration > 0 ? (
-                <span className="text-xs font-bold font-mono">{timerDuration}s</span>
-              ) : (
-                <Timer className="w-4 h-4" />
+              <Timer className="w-5 h-5" />
+              {settings.timerDuration > 0 && (
+                <span className="absolute top-0 right-0 text-[9px] font-bold text-amber-400">
+                  {settings.timerDuration}
+                </span>
               )}
             </button>
 
-            {/* Torch toggle */}
             {showTorchButton && (
               <button
                 onClick={handleTorchCycle}
-                className={`p-2 rounded-full transition-all ${
+                className={`p-2 rounded-full transition-colors ${
                   torchControl.torchMode === 'on'
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                    : 'bg-white/5 text-white/50 border border-white/10'
+                    ? 'bg-amber-500/20 text-amber-400'
+                    : 'text-white/60 hover:text-white'
                 }`}
               >
                 {torchControl.torchMode === 'on' ? (
-                  <Zap className="w-4 h-4" />
+                  <Zap className="w-5 h-5" />
                 ) : (
-                  <ZapOff className="w-4 h-4" />
+                  <ZapOff className="w-5 h-5" />
                 )}
               </button>
             )}
-          </div>
 
-          {/* Center: Blur strength toggle */}
-          {showBlurStrength && (
-            <BlurStrengthToggle level={blurLevel} onSelect={setBlurLevel} />
-          )}
-
-          {/* Right controls */}
-          <div className="flex items-center gap-2">
-            {/* Cinema controls toggle */}
-            {showCinemaPanel && (
-              <button
-                onClick={() => setShowCinemaControls((v) => !v)}
-                className={`p-2 rounded-full transition-all ${
-                  showCinemaControls
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                    : 'bg-white/5 text-white/50 border border-white/10'
-                }`}
-              >
-                <Layers className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Manual controls toggle (Pro mode) */}
-            {isProMode && (
-              <button
-                onClick={() => setShowManualControls((v) => !v)}
-                className={`p-2 rounded-full transition-all ${
-                  showManualControls
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                    : 'bg-white/5 text-white/50 border border-white/10'
-                }`}
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Switch camera */}
+            {/* AI Denoise quick toggle */}
             <button
-              onClick={handleSwitchCamera}
-              className="p-2 rounded-full bg-white/5 text-white/50 border border-white/10 transition-all hover:bg-white/10"
+              onClick={noiseReduction.toggle}
+              className={`p-2 rounded-full transition-colors ${
+                noiseReduction.isEnabled
+                  ? 'bg-amber-500/20 text-amber-400'
+                  : 'text-white/60 hover:text-white'
+              }`}
+              title="Toggle AI Denoise"
             >
-              <SwitchCamera className="w-4 h-4" />
+              <Sparkles className="w-5 h-5" />
             </button>
           </div>
-        </div>
 
-        {/* Zoom slider */}
-        <ZoomSlider zoom={zoom} maxZoom={maxZoom} onChange={setZoom} />
-
-        {/* Shutter row */}
-        <div className="flex items-center justify-center gap-8 pt-1">
-          {/* Left: mode icon */}
-          <div className="w-12 h-12 flex items-center justify-center">
-            {isVideoOrCinematic ? (
-              <Video className="w-6 h-6 text-amber-400/60" />
-            ) : (
-              <Camera className="w-6 h-6 text-amber-400/60" />
-            )}
-          </div>
-
-          {/* Shutter / Record button */}
+          {/* Capture / Record Button */}
           {isVideoOrCinematic ? (
             <button
               onClick={handleRecordToggle}
-              disabled={!isActive || isLoading}
-              className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-all ${
+              disabled={!isActive || cameraLoading}
+              className={`relative w-16 h-16 rounded-full border-4 transition-all duration-150 active:scale-95 disabled:opacity-50 ${
                 isRecording
                   ? 'border-red-500 bg-red-500/20'
-                  : 'border-white/80 bg-white/10 hover:bg-white/20'
-              } disabled:opacity-40`}
+                  : 'border-red-400 bg-transparent'
+              }`}
             >
               {isRecording ? (
-                <Square className="w-6 h-6 text-red-400 fill-red-400" />
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-5 h-5 rounded-sm bg-red-500" />
+                </span>
               ) : (
-                <Circle className="w-8 h-8 text-red-400 fill-red-400" />
+                <Video className="w-6 h-6 text-red-400 mx-auto" />
               )}
             </button>
           ) : (
             <button
               onClick={handleCapture}
-              disabled={!isActive || isLoading || isCapturing}
-              className="w-16 h-16 rounded-full border-4 border-white/80 bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all disabled:opacity-40"
+              disabled={!isActive || cameraLoading}
+              className="relative w-16 h-16 rounded-full border-4 border-white bg-white/10 hover:bg-white/20 transition-all duration-150 active:scale-95 disabled:opacity-50"
             >
-              {isCapturing ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-white/90" />
-              )}
+              <Camera className="w-6 h-6 text-white mx-auto" />
             </button>
           )}
 
-          {/* Right: switch camera */}
-          <button
-            onClick={handleSwitchCamera}
-            className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all"
-          >
-            <SwitchCamera className="w-5 h-5 text-white/70" />
-          </button>
+          {/* Right controls */}
+          <div className="flex items-center gap-2">
+            {(isProMode || isPortraitMode) && (
+              <button
+                onClick={() => setShowManualControls((v) => !v)}
+                className={`p-2 rounded-full transition-colors ${
+                  showManualControls
+                    ? 'bg-amber-500/20 text-amber-400'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <Settings2 className="w-5 h-5" />
+              </button>
+            )}
+
+            {isCinematic && (
+              <button
+                onClick={() => setShowCinemaControls((v) => !v)}
+                className={`p-2 rounded-full transition-colors ${
+                  showCinemaControls
+                    ? 'bg-amber-500/20 text-amber-400'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <Settings2 className="w-5 h-5" />
+              </button>
+            )}
+
+            <button
+              onClick={handleSwitchCamera}
+              className="p-2 rounded-full text-white/60 hover:text-white transition-colors"
+            >
+              <FlipHorizontal className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

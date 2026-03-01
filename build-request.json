@@ -1,63 +1,16 @@
 {
   "kind": "build_request",
-  "title": "Cinema Camera Controls & Enhanced Blur Intensity",
-  "projectName": "Lens Studio",
+  "title": "AI noise reduction for photos and video in low-light conditions",
   "priority": "normal",
-  "requirements": [
-    {
-      "id": "REQ-22",
-      "text": "Redesign the camera viewfinder control layout to adopt a cinema camera aesthetic: replace the current controls with a professional cinematography-inspired UI featuring an anamorphic widescreen letterbox overlay toggle (2.39:1 crop guides), a cinema-style circular exposure wheel/dial for EV adjustment, cine color profile selector (Rec.709, Log-C flat, D-Cinema), and a focal length/lens indicator overlay label. Group these controls in a dedicated 'Cinema Controls' panel that slides up when Cinematic or Video mode is active. Keep all existing functional hooks (useManualControls, useCinematicMode, etc.) wired to the new UI elements.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "I need cinema camera like controls"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A circular exposure wheel/dial is visible and functional in Cinematic and Video modes, replacing or augmenting the existing EV slider",
-        "A cine color profile selector with at least Rec.709, Log-C (flat), and D-Cinema options is visible and applies a CSS/canvas filter to the live preview",
-        "An anamorphic crop guide toggle (2.39:1 letterbox bars) is accessible and renders as a semi-transparent overlay on the viewfinder",
-        "A focal length/lens indicator label (e.g. '24mm eq.') is shown as a HUD overlay on the viewfinder",
-        "All new controls use the existing dark amber/gold theme and glass-morphism styling consistent with the app's design tokens",
-        "Existing functionality (zoom, torch, grid, timer, manual controls) remains fully operational"
-      ]
-    },
-    {
-      "id": "REQ-23",
-      "text": "Increase the background blur intensity across all blur-producing effects: in useAIBlur, raise the canvas blur filter sigma so the background blur is visibly stronger (minimum effective blur radius equivalent to CSS blur(24px) or higher); in useCinematicMode, increase the background blur sigma applied to the off-screen canvas to a minimum of blur(28px) equivalent; in FocusEditPanel, raise the default and maximum blur intensity slider values so the bokeh mask produces a more pronounced separation. Expose a 'Blur Strength' quick-toggle button in the camera controls row (Light / Strong / Max) that scales the blur multiplier at runtime across all active blur effects.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "need more blur"
-        ]
-      },
-      "acceptanceCriteria": [
-        "AI Blur background is visibly much stronger — background details are heavily obscured at default strength",
-        "Cinematic Mode background blur is stronger by default, producing clear subject/background separation",
-        "FocusEditPanel maximum blur intensity is increased so exported frames show pronounced bokeh",
-        "A 'Blur Strength' toggle button with three levels (Light, Strong, Max) appears in the camera controls row when AI Blur or Cinematic mode is active",
-        "Selecting 'Max' produces near-complete background obscuration while keeping the subject mask sharp",
-        "The blur strength preference persists in localStorage across sessions"
-      ]
-    }
-  ],
+  "requirements": [],
   "constraints": [
-    "Do not modify files listed in frontend.immutablePaths",
-    "All Motoko logic must remain in the single backend/main.mo actor",
-    "Reuse existing hooks (useAIBlur, useCinematicMode, useManualControls, useCinematicMode) — extend them rather than replacing them",
-    "New UI controls must use existing Tailwind design tokens and amber/gold accent colors from the established theme"
+    "All four noise reduction features (useNoiseReduction hook, photo pipeline integration, video pipeline integration, AI Denoise toggle) are already implemented as existing features — do not duplicate or modify them unless a defect is identified.",
+    "Do not change the backend schema or Motoko actor."
   ],
   "nonGoals": [
-    "Adding new backend endpoints or data models",
-    "Changing the gallery page layout or lightbox behavior",
-    "Implementing server-side color science or LUT processing",
-    "Adding new camera modes beyond those already in the ModeSelector"
+    "Adding new noise reduction algorithms beyond the existing bilateral-filter simulation.",
+    "Server-side noise processing.",
+    "Noise reduction for modes other than low-light, Night, and Portrait (already covered by existing logic)."
   ],
   "imageRequirements": {
     "required": [],

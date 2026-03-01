@@ -1,72 +1,37 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T11:11:40.639Z",
-  "summary": "The diff implements most of REQ-22 and REQ-23. New components and hooks cover the circular exposure wheel, cine color profile selector, anamorphic overlay, focal length indicator, blur strength toggle with localStorage persistence, and increased blur sigmas. However, several integration and AC-level details need verification due to truncated CameraPage and FocusEditPanel diffs.",
-  "missing_requirements": [
+  "generatedAt": "2026-03-01T11:58:41.080Z",
+  "summary": "The build request has no requirements or acceptance criteria — it explicitly states 'Requirements: none' and 'Acceptance Criteria: none'. The constraint says the four noise reduction features are already implemented and should not be duplicated or modified. However, the diff adds two new files (useNoiseReduction.ts and NoiseReductionToggle.tsx) and modifies CameraPage.tsx to integrate them, which implements features the constraints say already exist. Since there are no stated requirements to verify against, there are no missing requirements. The hallucinated features are the newly added noise reduction implementations that the constraints explicitly say should not be added.",
+  "missing_requirements": [],
+  "hallucinated_features": [
     {
-      "id": "REQ-22",
-      "requirement": "The Cinema Controls panel must slide up when Cinematic or Video mode is active",
-      "reason": "CameraPage.tsx is truncated and shows showCinemaControls state but the actual conditional rendering of CinemaControlsPanel with a slide-up animation tied to Cinematic/Video mode activation cannot be confirmed from the truncated diff.",
+      "description": "New useNoiseReduction hook added implementing bilateral-filter-simulated noise reduction with strength levels (off/light/strong/max), localStorage persistence, and canvas/byte processing utilities.",
+      "reason": "The build request constraints explicitly state that the useNoiseReduction hook is already implemented as an existing feature and should not be duplicated or modified. This is a new file implementing the hook from scratch.",
+      "evidence": [
+        "frontend/src/hooks/useNoiseReduction.ts"
+      ]
+    },
+    {
+      "description": "New NoiseReductionToggle component added providing a UI toggle with four strength levels (Off, Light, Strong, Max) and an animated ON badge.",
+      "reason": "The build request constraints state the AI Denoise toggle is already implemented as an existing feature and should not be duplicated or modified. This is a new file creating the component from scratch.",
+      "evidence": [
+        "frontend/src/components/NoiseReductionToggle.tsx"
+      ]
+    },
+    {
+      "description": "CameraPage.tsx modified to import and integrate the useNoiseReduction hook and NoiseReductionToggle component, wiring isLowLightMode auto-enable for Night/Portrait modes.",
+      "reason": "The build request constraints state photo pipeline integration and video pipeline integration for noise reduction are already implemented as existing features and should not be duplicated or modified. This modifies CameraPage to add these integrations.",
       "evidence": [
         "frontend/src/pages/CameraPage.tsx"
       ]
-    },
-    {
-      "id": "REQ-22",
-      "requirement": "The cine color profile selector must apply a CSS/canvas filter to the live preview video element",
-      "reason": "useCineColorProfile.ts exposes a cssFilter string and CameraPage imports it, but the truncated CameraPage diff does not confirm the cssFilter is actually applied to the video/canvas element style.",
-      "evidence": [
-        "frontend/src/pages/CameraPage.tsx",
-        "frontend/src/hooks/useCineColorProfile.ts"
-      ]
-    },
-    {
-      "id": "REQ-23",
-      "requirement": "FocusEditPanel maximum blur intensity slider values must be raised so the bokeh mask produces a more pronounced separation",
-      "reason": "FocusEditPanel.tsx multiplies blurIntensity by 3 for the render but the Slider component max and default value props are not visible in the truncated diff, so raised slider bounds cannot be confirmed.",
-      "evidence": [
-        "frontend/src/components/FocusEditPanel.tsx"
-      ]
     }
   ],
-  "hallucinated_features": [
-    {
-      "description": "useCinematicMode bakes letterbox bars directly onto the canvas output in addition to the separate AnamorphicOverlay component",
-      "reason": "The spec requests an anamorphic overlay toggle as a separate UI element. The cinematic mode hook also rendering letterbox bars into the canvas was not requested and duplicates the overlay behavior.",
-      "evidence": [
-        "frontend/src/hooks/useCinematicMode.ts"
-      ]
-    },
-    {
-      "description": "useAnamorphicOverlay persists its toggle state to localStorage",
-      "reason": "The build request only specifies localStorage persistence for blur strength in REQ-23. Persisting the anamorphic overlay toggle state was not requested.",
-      "evidence": [
-        "frontend/src/hooks/useAnamorphicOverlay.ts"
-      ]
-    },
-    {
-      "description": "useCineColorProfile persists the selected color profile to localStorage",
-      "reason": "The build request does not specify persisting the color profile selection across sessions; only blur strength persistence was explicitly required in REQ-23.",
-      "evidence": [
-        "frontend/src/hooks/useCineColorProfile.ts"
-      ]
-    }
-  ],
-  "confidence": 0.62,
+  "confidence": 0.8,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/AnamorphicOverlay.tsx",
-    "frontend/src/components/BlurStrengthToggle.tsx",
-    "frontend/src/components/CinemaControlsPanel.tsx",
-    "frontend/src/components/FocalLengthIndicator.tsx",
-    "frontend/src/components/FocusEditPanel.tsx",
-    "frontend/src/hooks/useAIBlur.ts",
-    "frontend/src/hooks/useAnamorphicOverlay.ts",
-    "frontend/src/hooks/useBlurStrength.ts",
-    "frontend/src/hooks/useCineColorProfile.ts",
-    "frontend/src/hooks/useCinematicMode.ts",
-    "frontend/src/hooks/useManualControls.ts",
+    "frontend/src/components/NoiseReductionToggle.tsx",
+    "frontend/src/hooks/useNoiseReduction.ts",
     "frontend/src/pages/CameraPage.tsx",
     "project_state.json"
   ]

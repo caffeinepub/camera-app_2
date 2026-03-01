@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
+  "projectStateVersion": 17,
   "summary": "A professional camera app inspired by Sony Xperia Pro-I/Pro, featuring advanced photo and video capabilities including manual controls, video recording, and pro-level camera features.",
   "architectural_notes": [
     "Video recording uses MediaRecorder API with configurable MIME type/bitrate; recorded blobs saved as base64 or object URLs via backend.",
@@ -176,6 +176,38 @@
         "REQ-23"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-create-a-usenoisereduction-frontend-hook-that-applies-an-ai-style-noise-reduction-effect-to-a-canvas-frame-using-a-multi-pass-approach-a-luminance-preserving-bilateral-filter-simulation-implemented-via-repeated-box-blur-passes-combined-with-edge-detection-weighted-pixel-blending-on-an-offscreencanvas-to-smooth-chroma-luma-noise-while-retaining-fine-detail-edges-the-hook-must-accept-an-intensity-level-off-low-high-and-a-blur-strength-multiplier-sourced-from-the-existing-useblurstrength-hook-and-expose-a-processframe-srccanvas-imagedata-function-that-returns-the-denoised-frame",
+      "title": "Create a `useNoiseReduction` frontend hook that applies an AI-style noise reduction effect to a canvas frame using a multi-pass approach: a luminance-preserving bilateral-filter simulation (implemented via repeated box-blur passes combined with edge-detection-weighted pixel blending on an OffscreenCanvas) to smooth chroma/luma noise while retaining fine detail edges. The hook must accept an intensity level (Off / Low / High) and a blur strength multiplier sourced from the existing `useBlurStrength` hook, and expose a `processFrame(srcCanvas) => ImageData` function that returns the denoised frame.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-noise-reduction-into-the-photo-capture-pipeline-in-camerapage-tsx-before-the-captured-canvas-frame-is-converted-to-a-data-url-and-sent-to-the-backend-via-savephoto-pass-the-canvas-imagedata-through-usenoisereduction-processframe-when-the-active-camera-mode-is-night-portrait-or-when-the-scene-is-detected-as-low-light-average-luma-80-out-of-255-sampled-from-the-centre-of-the-frame-apply-noise-reduction-automatically-in-those-conditions-at-high-intensity-in-all-other-modes-apply-it-at-low-intensity-unless-the-user-has-toggled-it-off",
+      "title": "Integrate noise reduction into the photo capture pipeline in `CameraPage.tsx`. Before the captured canvas frame is converted to a data URL and sent to the backend via `savePhoto`, pass the canvas ImageData through `useNoiseReduction.processFrame` when the active camera mode is Night, Portrait, or when the scene is detected as low-light (average luma < 80 out of 255 sampled from the centre of the frame). Apply noise reduction automatically in those conditions at 'high' intensity; in all other modes apply it at 'low' intensity unless the user has toggled it off.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-noise-reduction-into-the-video-recording-pipeline-when-recording-is-active-mediarecorder-running-pipe-each-composited-frame-through-usenoisereduction-processframe-on-the-offscreencanvas-before-writing-it-to-the-output-mediastream-that-feeds-the-mediarecorder-the-processing-must-run-inside-the-existing-per-frame-render-loop-in-usecinematicmode-useaiblur-or-the-raw-camera-capture-loop-in-camerapage-so-the-saved-video-clip-contains-denoised-frames-noise-reduction-in-video-mode-should-activate-automatically-when-low-light-is-detected-same-luma-heuristic-as-req-25-or-when-the-user-enables-it-manually-via-the-ai-denoise-toggle-req-27",
+      "title": "Integrate noise reduction into the video recording pipeline. When recording is active (MediaRecorder running), pipe each composited frame through `useNoiseReduction.processFrame` on the OffscreenCanvas before writing it to the output MediaStream that feeds the MediaRecorder. The processing must run inside the existing per-frame render loop (in `useCinematicMode`, `useAIBlur`, or the raw camera capture loop in `CameraPage`) so the saved video clip contains denoised frames. Noise reduction in video mode should activate automatically when low-light is detected (same luma heuristic as REQ-25) or when the user enables it manually via the AI Denoise toggle (REQ-27).",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-ai-denoise-toggle-button-to-the-camera-controls-row-in-camerapage-tsx-styled-consistently-with-the-existing-ai-blur-button-the-button-should-cycle-through-three-states-off-auto-activates-automatically-in-low-light-on-always-active-display-a-pulsing-amber-ai-nr-indicator-badge-in-the-viewfinder-overlay-while-noise-reduction-is-processing-persist-the-user-s-last-used-denoise-state-to-localstorage-under-the-key-lens-denoise-mode",
+      "title": "Add an 'AI Denoise' toggle button to the camera controls row in `CameraPage.tsx`, styled consistently with the existing 'AI Blur' button. The button should cycle through three states: Off → Auto (activates automatically in low-light) → On (always active). Display a pulsing amber 'AI NR' indicator badge in the viewfinder overlay while noise reduction is processing. Persist the user's last-used Denoise state to localStorage under the key `lens_denoise_mode`.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -271,6 +303,44 @@
       "id": "AR-16",
       "summary": "Increase blur intensity for background blur/bokeh effects (both AI blur and cinematic mode) to produce stronger, more pronounced background separation",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "AI-based noise reduction for photos and video in low-light conditions",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Create a `useNoiseReduction` frontend hook that applies an AI-style noise reduction effect to a canvas frame using a multi-pass approach: a luminance-preserving bilateral-filter simulation (implemented via repeated box-blur passes combined with edge-detection-weighted pixel blending on an OffscreenCanvas) to smooth chroma/luma noise while retaining fine detail edges. The hook must accept an intensity level (Off / Low / High) and a blur strength multiplier sourced from the existing `useBlurStrength` hook, and expose a `processFrame(srcCanvas) => ImageData` function that returns the denoised frame.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Integrate noise reduction into the photo capture pipeline in `CameraPage.tsx`. Before the captured canvas frame is converted to a data URL and sent to the backend via `savePhoto`, pass the canvas ImageData through `useNoiseReduction.processFrame`. When the active camera mode is Night or Portrait, or when the scene is detected as low-light (average luma < 80 out of 255 sampled from the centre of the frame), apply noise reduction automatically at 'high' intensity. In all other modes apply it at 'low' intensity unless the user has toggled it off via the AI Denoise control.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Integrate noise reduction into the video recording pipeline. When recording is active (MediaRecorder running), pipe each composited frame through `useNoiseReduction.processFrame` on the OffscreenCanvas before writing it to the output MediaStream that feeds the MediaRecorder. The processing must run inside the existing per-frame render loop (in `useCinematicMode`, `useAIBlur`, or the raw camera capture loop in `CameraPage`) so the saved video clip contains denoised frames. Noise reduction in video mode should activate automatically when low-light is detected (same average luma < 80 heuristic as REQ-29) or when the user enables it manually via the AI Denoise toggle.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add an 'AI Denoise' toggle button to the camera controls row in `CameraPage.tsx`, styled consistently with the existing 'AI Blur' button. The button cycles through three states: Off → Auto (activates automatically in low-light) → On (always active). Display a pulsing amber 'AI NR' indicator badge in the viewfinder overlay while noise reduction is processing. Persist the user's last-used Denoise state to localStorage under the key `lens_denoise_mode`.",
+      "reqIds": [
+        "REQ-31"
+      ],
       "status": "pending"
     }
   ],

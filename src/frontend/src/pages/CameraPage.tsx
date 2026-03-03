@@ -153,6 +153,13 @@ export default function CameraPage() {
   const [isAIAutoMode, setIsAIAutoMode] = useState(true);
   const [lastPhotoUrl, setLastPhotoUrl] = useState<string | null>(null);
 
+  // Per-param auto state — all auto by default
+  const [isoAuto, setIsoAuto] = useState(true);
+  const [shutterAuto, setShutterAuto] = useState(true);
+  const [wbAuto, setWbAuto] = useState(true);
+  const [afAuto, setAfAuto] = useState(true);
+  const [evAuto, setEvAuto] = useState(true);
+
   // Pro param values (numeric index or raw value for scrubber)
   const [isoIndex, setIsoIndex] = useState(3); // ISO 400
   const [shutterIndex, setShutterIndex] = useState(6); // 1/60s
@@ -407,6 +414,32 @@ export default function CameraPage() {
       saveWhiteBalance(kelvin);
     },
     [setWhiteBalance, getVideoTrack, saveWhiteBalance],
+  );
+
+  // Handle per-param auto toggle
+  const handleParamAutoChange = useCallback(
+    (param: ProParam, auto: boolean) => {
+      switch (param) {
+        case "ISO":
+          setIsoAuto(auto);
+          break;
+        case "S":
+          setShutterAuto(auto);
+          break;
+        case "WB":
+          setWbAuto(auto);
+          if (auto) handleWhiteBalanceChange(5200); // reset to neutral auto
+          break;
+        case "AF":
+          setAfAuto(auto);
+          break;
+        case "EV":
+          setEvAuto(auto);
+          if (auto) handleExposureChange(0); // reset EV to 0 when auto
+          break;
+      }
+    },
+    [handleWhiteBalanceChange, handleExposureChange],
   );
 
   // Handle scrubber changes per param
@@ -919,13 +952,16 @@ export default function CameraPage() {
           activeParam={activeParam}
           onParamSelect={setActiveParam}
           isoValue={ISO_VALUES[isoIndex] ?? 400}
-          isoAuto={isAIAutoMode}
+          isoAuto={isoAuto}
           shutterValue={SHUTTER_VALUES[shutterIndex] ?? "1/60s"}
-          shutterAuto={isAIAutoMode}
+          shutterAuto={shutterAuto}
           wbValue={wbValue}
-          wbAuto={isAIAutoMode}
+          wbAuto={wbAuto}
           afValue={afValue}
+          afAuto={afAuto}
           evValue={evValue}
+          evAuto={evAuto}
+          onParamAutoChange={handleParamAutoChange}
         />
 
         {/* Ruler Scrubber */}
